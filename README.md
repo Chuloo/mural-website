@@ -24,7 +24,7 @@ Connect this repository in **Workers & Pages → Create application → Pages �
 | Build output directory | `dist` |
 | Root directory | Repository root |
 
-Add `mural.chat` through the Pages project’s **Custom domains** panel. Its Cloudflare zone must be active for the apex domain. Preserve existing email DNS records when changing nameservers at the registrar. Each push to `main` publishes the site; other branches can receive preview deployments.
+The live project is `mural-website` ([Cloudflare URL](https://mural-website-cgk.pages.dev)), connected to this repository. Add `mural.chat` through the Pages project’s **Custom domains** panel. Its Cloudflare zone must be active for the apex domain. Preserve existing email DNS records when changing nameservers at the registrar. Each push to `main` publishes the site; other branches can receive preview deployments.
 
 See [Cloudflare’s Git integration guide](https://developers.cloudflare.com/pages/get-started/git-integration/) and [custom-domain instructions](https://developers.cloudflare.com/pages/configuration/custom-domains/).
 
@@ -32,7 +32,7 @@ See [Cloudflare’s Git integration guide](https://developers.cloudflare.com/pag
 
 The download button currently opens `/download/`, which explains that TestFlight is pending and links to the source installation guide. Replace the destination with the verified public TestFlight invitation after Apple approves the beta. Do not advertise available free minutes or purchases until those features are enabled and verified.
 
-Canonical URLs, social tags and the sitemap use `https://mural.chat`. The privacy and terms pages describe the current app using a personal OpenAI API key. Update them with the operator’s registered entity, country, service providers and retention periods before launching accounts or payments.
+Canonical URLs, social tags and the sitemap use `https://mural.chat`. The privacy and terms pages describe the current app using a personal OpenAI API key. The operator is Hackmamba Inc., registered in the United States. Update the service providers, billing records and retention periods before launching accounts or payments.
 
 ## Assets and licenses
 
