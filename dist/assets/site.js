@@ -7,11 +7,35 @@
   const versions = [
     {lang:'en', name:'English', lines:['The language app','you eventually delete']},
     {lang:'es', name:'Español', lines:['La app de idiomas','que acabarás borrando']},
-    {lang:'fr', name:'Français', lines:['L’appli de langues','que vous finirez par supprimer']},
-    {lang:'de', name:'Deutsch', lines:['Die Sprachlern-App,','die du irgendwann löschst']},
+    {lang:'fr', name:'Français', lines:['L’appli de langues que','vous finirez par supprimer']},
+    {lang:'de', name:'Deutsch', lines:['Die Sprachlern-App, die','du irgendwann löschst']},
     {lang:'pt', name:'Português', lines:['A app de línguas','que um dia vais apagar']},
     {lang:'ja', name:'日本語', lines:['いつか削除する、','語学学習アプリ']}
   ];
+  // Use one size for every translation, within a fixed two-line heading.
+  // The reserved height does not change as languages rotate or fonts load.
+  const title = headline.closest('h1');
+  function fitHeadlines() {
+    const measure = document.createElement('span');
+    measure.className = 'headline-measure';
+    measure.setAttribute('aria-hidden', 'true');
+    title.append(measure);
+    let widest = 0;
+    for (const version of versions) {
+      measure.lang = version.lang;
+      for (const line of version.lines) {
+        measure.textContent = line;
+        widest = Math.max(widest, measure.getBoundingClientRect().width);
+      }
+    }
+    const base = parseFloat(getComputedStyle(title).fontSize);
+    const scale = Math.min(1, (title.clientWidth - 4) / Math.max(1, widest));
+    headline.style.setProperty('--headline-size', `${Math.floor(base * scale * 100) / 100}px`);
+    measure.remove();
+  }
+  fitHeadlines();
+  new ResizeObserver(fitHeadlines).observe(title);
+  document.fonts.ready.then(fitHeadlines);
   let index = 0, paused = reduced.matches, timer, transition;
   const canvas = document.querySelector('#mural-orb');
   const ctx = canvas?.getContext('2d');

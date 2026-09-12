@@ -30,9 +30,13 @@ See [Cloudflare’s Git integration guide](https://developers.cloudflare.com/pag
 
 ## Release details
 
-The download button currently opens `/download/`, which explains that TestFlight is pending and links to the source installation guide. Replace the destination with the verified public TestFlight invitation after Apple approves the beta. Do not advertise available free minutes or purchases until those features are enabled and verified.
+The Apple-logo **Request access** button opens an email form. `/download/` offers the same form and the source installation guide. After Apple approves the beta, replace the access CTA with the verified public TestFlight invitation. Do not advertise available free minutes or purchases until those features are enabled and verified.
 
-Canonical URLs, social tags and the sitemap use `https://mural.chat`. The privacy and terms pages describe the current app using a personal OpenAI API key. The operator is Hackmamba Inc., registered in the United States. Update the service providers, billing records and retention periods before launching accounts or payments.
+The form submits to `https://api.mural.chat/v1/access-requests`. The separate app backend stores the email, request date, consent version and website source in PostgreSQL. It sends no automatic emails and creates no app account. Validation, duplicate handling, admission limits, retention and private export/deletion commands are documented in the [access-request runbook](https://github.com/Chuloo/mural/blob/main/server/docs/access-requests.md). Deploy that backend before publishing the form. No credentials belong in this repository.
+
+Production accepts requests only from `https://mural.chat`; local and Cloudflare preview pages can show the form but cannot submit to the production database. Use a separately configured local API for development submissions. A successful form test should use a disposable test address and remove its database row afterward.
+
+Canonical URLs, social tags and the sitemap use `https://mural.chat`. The privacy and terms pages describe the app using a personal OpenAI API key and the website access list. The operator is Hackmamba Inc., registered in the United States. Update the service providers, billing records and retention periods before launching accounts or payments.
 
 ## Assets and licenses
 

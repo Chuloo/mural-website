@@ -23,9 +23,11 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--focus);outline-offs
 .orb canvas{width:100%;height:100%;display:block;filter:drop-shadow(0 10px 16px #f29f7224)}
 .orb i,.orb b{display:block;position:absolute;border-radius:50%;background:linear-gradient(130deg,#fff7dc,#ffc59f);width:10px;height:10px;right:-15px;top:28px}
 .orb b{width:6px;height:6px;left:-18px;top:86px;opacity:.65}
-h1{font-size:clamp(44px,6.1vw,80px);font-weight:650;line-height:1.09;letter-spacing:-.055em;margin:0 auto;max-width:1030px;min-height:2.2em;display:grid;align-items:center;text-wrap:balance}
-#headline{display:block;transition:opacity .45s ease,filter .45s ease,transform .45s ease}
-#headline span,#headline em{display:block}
+h1{font-size:clamp(44px,6.1vw,80px);font-weight:650;line-height:1.09;letter-spacing:-.055em;margin:0 auto;max-width:1030px;display:grid;align-items:center;text-wrap:balance}
+.hero h1{height:2.2em;position:relative}
+#headline{display:block;font-size:var(--headline-size,1em);transition:opacity .45s ease,filter .45s ease,transform .45s ease}
+#headline span,#headline em{display:block;white-space:nowrap}
+.headline-measure{position:absolute;visibility:hidden;pointer-events:none;white-space:nowrap;font:inherit;letter-spacing:inherit;width:max-content;inset:0 auto auto 0}
 #headline em{font-style:normal;color:#9a5538}
 #headline.changing{opacity:0;filter:blur(5px);transform:translateY(7px)}
 .language-switch{display:flex;justify-content:center;align-items:center;gap:7px;height:25px;margin-top:19px;font-size:11px;letter-spacing:.06em;color:var(--muted)}
@@ -63,8 +65,48 @@ h1{font-size:clamp(44px,6.1vw,80px);font-weight:650;line-height:1.09;letter-spac
 .legal a{text-decoration:underline;text-underline-offset:4px}
 .legal .button{text-decoration:none;color:var(--ink)}
 .legal .date{font-size:13px}
+.legal-document header>p:not(.date){font-size:17px;line-height:1.75}
+.legal-document section{border-top:1px solid #ded0bf80;margin-top:34px;padding-top:4px}
+.legal-document h2{scroll-margin-top:28px;line-height:1.35;letter-spacing:-.4px}
+.legal-document li{padding-left:4px;margin-bottom:10px}
+.legal-toc{margin-top:28px;background:#ffffff75;border:1px solid #fff9;border-radius:22px;padding:22px 24px}
+.legal-toc p{font-size:12px;font-weight:650;color:var(--ink);margin:0 0 14px}
+.legal-toc ul{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 22px;margin:0;padding:0;list-style:none}
+.legal-toc li{font-size:12px;line-height:1.55;padding:0;margin:0}
+.legal-toc a{text-decoration:none}
+.legal-toc a:hover{text-decoration:underline}
+@media(max-width:480px){.legal-toc ul{grid-template-columns:1fr}}
 .note{padding:20px 24px;background:var(--peach);border-radius:20px}
 .download-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+html{scrollbar-gutter:stable}
+body.access-open{overflow:hidden}
+.access-dialog{border:1px solid #fffdf7;border-radius:34px;padding:40px;width:min(460px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;background:radial-gradient(ellipse at 5% 0%,#ffe5ca88,transparent 60%),radial-gradient(ellipse at 100% 90%,#eee4f87a,transparent 60%),#fffaf2;color:var(--ink);box-shadow:0 28px 100px #54382229;font-family:system-ui,-apple-system,sans-serif}
+.access-dialog::backdrop{background:#49312135;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.access-dialog[open]{animation:arrive .3s cubic-bezier(.2,.8,.2,1)}
+.access-close{position:absolute;right:14px;top:14px;width:44px;height:44px;display:grid;place-items:center;border:0;border-radius:50%;background:transparent;color:var(--muted);cursor:pointer}
+.access-close:hover{background:#fff9}
+.access-orb{width:55px;height:55px;margin:0 0 25px;border-radius:48% 51% 47% 51%;background:radial-gradient(ellipse at 23% 4%,#fff2c4,transparent 58%),radial-gradient(ellipse at 95% 66%,#c7ace8,transparent 61%),radial-gradient(ellipse at 28% 96%,#ff8860,transparent 65%),#ffb578;box-shadow:0 8px 25px #ff9a5120;animation:morph 9s ease-in-out infinite alternate}
+.access-dialog h2{font-family:ui-rounded,'SF Pro Rounded',system-ui,sans-serif;font-size:34px;line-height:1.1;font-weight:650;letter-spacing:-1.3px;margin:0 0 14px}
+.access-dialog p{font-size:15px;line-height:1.65;color:var(--muted);margin:0}
+.access-form{margin-top:26px}
+.access-form label{display:block;font-size:13px;font-weight:550;margin-bottom:9px}
+.access-form input[type=email]{appearance:none;width:100%;font:inherit;font-size:16px;color:var(--ink);background:#ffffffb8;border:1px solid #decdbb;border-radius:15px;padding:16px;outline:none}
+.access-form input[type=email]::placeholder{color:#9c897a}
+.access-form input[type=email]:focus{border-color:#a25a3b;box-shadow:0 0 0 3px #ffb78635}
+.access-form input[aria-invalid=true]{border-color:#a74232}
+.access-submit{width:100%;margin-top:15px;cursor:pointer;font-size:15px;min-height:54px}
+.access-submit:disabled{cursor:wait;opacity:.7;transform:none}
+.access-dialog .access-consent{font-size:11px;line-height:1.65;margin-top:16px}
+.access-consent a{color:var(--ink);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.access-dialog .access-error{font-size:13px;color:#903c2e;margin-top:10px}
+.access-trap{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+.access-success{margin-top:23px;outline:none}
+.access-dialog .access-success p{font-size:21px;color:var(--ink);font-weight:550;letter-spacing:-.5px}
+.access-success span{display:block;color:var(--muted);font-size:15px;line-height:1.6;margin-top:5px}
+.access-success .button{margin-top:27px;cursor:pointer}
+.access-dialog [hidden]{display:none!important}
+@keyframes arrive{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+@media(max-width:480px){.access-dialog{padding:32px 25px;border-radius:28px}.access-dialog h2{font-size:31px}}
 @keyframes float{0%,100%{transform:translateY(0)}
 50%{transform:translateY(-6px)}
 }
@@ -80,7 +122,7 @@ h1{font-size:clamp(44px,6.1vw,80px);font-weight:650;line-height:1.09;letter-spac
 .maker{font-size:11px}
 .hero{padding-top:42px;padding-bottom:40px}
 .orb{width:110px;height:114px;margin-bottom:30px}
-h1{font-size:clamp(35px,7.9vw,55px);letter-spacing:-.055em;min-height:3.3em}
+h1{font-size:clamp(29px,7.9vw,55px);letter-spacing:-.055em}
 .intro{font-size:16px;line-height:1.75;max-width:490px;margin-top:17px}
 .actions{gap:10px;margin-top:25px}
 .button{font-size:13px;padding:16px 20px}
