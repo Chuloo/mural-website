@@ -68,12 +68,16 @@
         headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
         body: JSON.stringify({ email: email.value.trim(), consentVersion: 'waitlist-v1', source: 'website', website: form.elements.website.value })
       });
+      const result = await response.json().catch(() => null);
       if (response.status === 400) {
         email.setAttribute('aria-invalid', 'true');
         throw new Error('Check your email address and try again.');
       }
       if (response.status === 429) throw new Error('A few too many requests. Please try again in an hour.');
-      if (response.status !== 202 || (await response.json()).accepted !== true) throw new Error('We couldn’t save your request. Please try again shortly.');
+      if (response.status === 503 && result?.error?.code === 'access_requests_full')
+        throw new Error('Access requests are temporarily at capacity. Please try again later, or email hi@hackmamba.io.');
+      if (response.status !== 202 || result?.accepted !== true)
+        throw new Error('Your request wasn’t saved. Please try again, or email hi@hackmamba.io for access.');
       accepted = true; form.hidden = true; success.hidden = false;
       dialog.querySelector('#access-description').hidden = true;
       // Email lives only in this request and the database, never browser storage.
