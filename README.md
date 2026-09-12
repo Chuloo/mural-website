@@ -24,7 +24,7 @@ Connect this repository in **Workers & Pages → Create application → Pages �
 | Build output directory | `dist` |
 | Root directory | Repository root |
 
-The live project is `mural-website` ([Cloudflare URL](https://mural-website-cgk.pages.dev)), connected to this repository. Add `mural.chat` through the Pages project’s **Custom domains** panel. Its Cloudflare zone must be active for the apex domain. Preserve existing email DNS records when changing nameservers at the registrar. Each push to `main` publishes the site; other branches can receive preview deployments.
+The live project is `mural-website` ([Cloudflare URL](https://mural-website-cgk.pages.dev)), connected to this repository. Add `mural.chat` through the Pages project’s **Custom domains** panel. Its Cloudflare zone must be active for the apex domain. Preserve existing email DNS records when changing nameservers at the registrar. Each push to `main` publishes the site; other branches can receive preview deployments. In the `mural.chat` zone, the active `Mural: www to canonical domain` Redirect Rule sends both HTTP and HTTPS requests for `www.mural.chat` to `https://mural.chat`, preserving paths and query strings. Domain-level redirects belong in Cloudflare Rules; the Pages `_redirects` file only supports relative source paths.
 
 See [Cloudflare’s Git integration guide](https://developers.cloudflare.com/pages/get-started/git-integration/) and [custom-domain instructions](https://developers.cloudflare.com/pages/configuration/custom-domains/).
 
