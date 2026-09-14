@@ -1,6 +1,6 @@
 # Mural website
 
-The public website for [Mural](https://mural.chat), an open-source iPhone app for learning through conversation. The app lives separately in [Chuloo/mural](https://github.com/Chuloo/mural).
+The public website for [Mural](https://mural.chat), an open-source language app for learning through conversation. The app lives separately in [Chuloo/mural](https://github.com/Chuloo/mural).
 
 ## Preview locally
 
@@ -32,11 +32,11 @@ See [Cloudflare’s Git integration guide](https://developers.cloudflare.com/pag
 
 The Apple-logo **Request access** button opens an email form. `/download/` offers the same form and the source installation guide. After Apple approves the beta, replace the access CTA with the verified public TestFlight invitation. Do not advertise available free minutes or purchases until those features are enabled and verified.
 
-The form submits to `https://api.mural.chat/v1/access-requests`. The separate app backend stores the email, request date, consent version and website source in PostgreSQL. It sends no automatic emails and creates no app account. Validation, duplicate handling, admission limits, retention and private export/deletion commands are documented in the [access-request runbook](https://github.com/Chuloo/mural/blob/main/server/docs/access-requests.md). Deploy that backend before publishing the form. No credentials belong in this repository.
+The form submits to `https://api.mural.chat/v1/access-requests`. The separate app backend stores the email, request date, consent version and website source in PostgreSQL. It sends no automatic emails and creates no app account. Validation, duplicate handling, admission limits, retention and private export/deletion commands are documented in the [access-request runbook](https://github.com/Chuloo/mural/blob/codex/android-release/services/api/docs/access-requests.md). Deploy that backend before publishing the form. No credentials belong in this repository.
 
 Production accepts requests only from `https://mural.chat`; local and Cloudflare preview pages can show the form but cannot submit to the production database. Use a separately configured local API for development submissions. A successful form test should use a disposable test address and remove its database row afterward.
 
-Canonical URLs, social tags and the sitemap use `https://mural.chat`. The privacy and terms pages describe the app using a personal OpenAI API key and the website access list. The operator is Hackmamba Inc., registered in the United States. Update the service providers, billing records and retention periods before launching accounts or payments.
+Canonical URLs, social tags and the sitemap use `https://mural.chat`. The privacy and terms pages describe guest trials, optional accounts, hosted conversations, personal API keys, access requests and conditional purchases. The operator is Hackmamba Inc., registered in the United States. The public account-deletion request path is `/support/#delete-account`. Keep the policies aligned with deployed features, provider processing and retention; purchases are not advertised as active until live checkout is verified.
 
 ## Assets and licenses
 
