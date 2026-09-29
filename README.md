@@ -30,7 +30,7 @@ See [Cloudflare’s Git integration guide](https://developers.cloudflare.com/pag
 
 ## Release details
 
-The homepage and `/download/` offer Android Download (Google Play), Apple Download (the iPhone waitlist form), and GitHub. The Apple button states that it joins the waitlist, and `/download/` retains the source installation guide. When Apple access opens, replace the waitlist destination with the verified public installation route. Do not advertise available free minutes or purchases until those features are enabled and verified.
+The homepage and `/download/` offer Android (Google Play), Apple (the iPhone waitlist form), and Github (the source repository). The Apple dialog explains the waitlist, and `/download/` retains the source installation guide. When Apple access opens, replace the waitlist destination with the verified public installation route. Do not advertise available free minutes or purchases until those features are enabled and verified.
 
 The form submits to `https://api.mural.chat/v1/access-requests`. The separate app backend stores the email, request date, consent version and website source in PostgreSQL. It sends no automatic emails and creates no app account. Validation, duplicate handling, admission limits, retention and private export/deletion commands are documented in the [access-request runbook](https://github.com/Chuloo/mural/blob/codex/android-release/services/api/docs/access-requests.md). Deploy that backend before publishing the form. No credentials belong in this repository.
 
