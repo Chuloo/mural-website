@@ -40,9 +40,13 @@ h1{font-size:clamp(44px,6.1vw,80px);font-weight:650;line-height:1.09;letter-spac
 .apple-icon{width:18px;height:21px}
 .actions{display:flex;justify-content:center;gap:12px;margin-top:30px;flex-wrap:wrap}
 .button{display:inline-flex;align-items:center;justify-content:center;gap:14px;border-radius:100px;padding:17px 25px;font-size:14px;font-weight:600;line-height:1.1;min-height:52px;transition:transform .2s,box-shadow .2s;background:#ffffffb8;border:1px solid #fff9;box-shadow:0 4px 18px #7d542b05}
+.download-button{min-width:192px;min-height:68px;padding:12px 20px;justify-content:flex-start;text-align:left}
+.button-copy{display:grid;gap:4px}
+.button-copy strong{font-size:14px;font-weight:650;white-space:nowrap}
+.button-copy small{font-size:11px;font-weight:450;line-height:1.2;color:#594335;white-space:nowrap}
 .button:hover{transform:translateY(-2px);box-shadow:0 8px 24px #a96c3216}
 .button.primary{background:var(--orange);border-color:#ffb086;box-shadow:0 7px 24px #fd9b5826}
-.availability{font-size:11px;line-height:1.6;color:var(--muted);margin-top:16px}
+.availability{font-size:12px;line-height:1.7;color:var(--muted);margin:17px auto 0;max-width:690px}
 .features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .feature{padding:28px 28px 30px;border-radius:27px;min-width:0}
 .peach{background:#ffe3cfc9}
@@ -78,6 +82,8 @@ h1{font-size:clamp(44px,6.1vw,80px);font-weight:650;line-height:1.09;letter-spac
 @media(max-width:480px){.legal-toc ul{grid-template-columns:1fr}}
 .note{padding:20px 24px;background:var(--peach);border-radius:20px}
 .download-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.download-actions .download-button{text-decoration:none}
+.download-actions + .note{margin-top:32px}
 html{scrollbar-gutter:stable}
 body.access-open{overflow:hidden}
 .access-dialog{border:1px solid #fffdf7;border-radius:34px;padding:40px;width:min(460px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;background:radial-gradient(ellipse at 5% 0%,#ffe5ca88,transparent 60%),radial-gradient(ellipse at 100% 90%,#eee4f87a,transparent 60%),#fffaf2;color:var(--ink);box-shadow:0 28px 100px #54382229;font-family:system-ui,-apple-system,sans-serif}
@@ -126,6 +132,7 @@ h1{font-size:clamp(29px,7.9vw,55px);letter-spacing:-.055em}
 .intro{font-size:16px;line-height:1.75;max-width:490px;margin-top:17px}
 .actions{gap:10px;margin-top:25px}
 .button{font-size:13px;padding:16px 20px}
+.download-button{min-width:192px;padding:12px 18px}
 .features{grid-template-columns:1fr;gap:12px;max-width:490px}
 .feature{padding:25px}
 .feature svg{margin-bottom:14px}
@@ -137,6 +144,7 @@ h1{font-size:clamp(29px,7.9vw,55px);letter-spacing:-.055em}
 .atmosphere span:nth-child(2){top:25%;right:-50%}
 .atmosphere span:nth-child(3){top:52%;left:5%}
 }
+@media(max-width:600px){.actions,.download-actions{flex-direction:column;align-items:stretch}.actions .download-button,.download-actions .download-button{width:100%;min-width:0}.actions .download-button{max-width:420px;margin-inline:auto}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 .orb{transform:none}
 .button:hover{transform:none}
