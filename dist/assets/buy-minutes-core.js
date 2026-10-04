@@ -1,6 +1,7 @@
 export const PURCHASE_API = 'https://api.mural.chat/v1/web-purchases';
 export const SESSION_KEY = 'mural.web-purchase.v1';
 export const ATTEMPT_KEY = 'mural.web-purchase-attempt.v1';
+export const RETURN_KEY = 'mural.web-purchase-return.v1';
 const uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 const money = value => Number.isSafeInteger(value) && value > 0 && value <= 100_000_000;
 const nano = value => typeof value === 'string' && /^(0|[1-9][0-9]{0,18})$/.test(value);
@@ -19,6 +20,13 @@ export function purchaseAttempt(value, email) {
       (value.orderID !== undefined && (typeof value.orderID !== 'string' || !uuid.test(value.orderID)))) return null;
   return { email:value.email,key:value.key,sku:value.sku,quantity:value.quantity,unitTotalMinor:value.unitTotalMinor,
     unitAIValueNanoUSD:value.unitAIValueNanoUSD,...(value.orderID?{orderID:value.orderID}:{}) };
+}
+export function purchaseReturn(value, email, now = Date.now()) {
+  if (!value || typeof value !== 'object' || Array.isArray(value) || value.email !== email || !uuid.test(value.orderID) ||
+      !Number.isSafeInteger(value.expiresAt) || value.expiresAt <= now || value.expiresAt > now + 1_800_000 ||
+      (value.checkOnReturn !== undefined && typeof value.checkOnReturn !== 'boolean') ||
+      Object.keys(value).some(key => !['email','orderID','expiresAt','checkOnReturn'].includes(key))) return null;
+  return {email:value.email,orderID:value.orderID,expiresAt:value.expiresAt,checkOnReturn:value.checkOnReturn === true};
 }
 export function originalOrderQuote(value,attempt) {
   const order=value?.order;

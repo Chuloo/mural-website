@@ -30,7 +30,15 @@
 .pack-minutes{display:block;font-family:system-ui,sans-serif;font-size:12px;font-weight:400;color:var(--muted);line-height:1.5;margin-top:3px}
 .pack-price{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
 .quantity-row{display:flex;align-items:center;justify-content:space-between;margin-top:23px;gap:16px}
-.quantity-row select{font:inherit;color:var(--ink);background:#fff;border:1px solid #c9b5a4;border-radius:12px;min-width:84px;min-height:44px;padding:8px 14px}
+.quantity-control{position:relative;flex-shrink:0}
+.quantity-control::after{content:'';position:absolute;right:17px;top:50%;width:8px;height:8px;border-right:2px solid var(--focus);border-bottom:2px solid var(--focus);transform:translateY(-65%) rotate(45deg);pointer-events:none}
+.quantity-row select{appearance:none;-webkit-appearance:none;display:block;font:inherit;font-size:16px;font-weight:600;line-height:1.25;color:var(--ink);background:#fff1e5;border:1px solid #c77546;border-radius:14px;width:104px;min-height:48px;padding:12px 42px 12px 16px;cursor:pointer}
+.quantity-row select:disabled{opacity:.65;cursor:default}
+.purchase-payment-status{padding:16px;background:#fff1e5;border-radius:14px;margin:20px 0}
+.purchase-card .payment-status-title{font:inherit;font-size:16px;font-weight:650;color:var(--ink);margin:0 0 8px}
+.purchase-payment-status p{margin-bottom:0}
+.purchase-payment-status .text-button{padding-bottom:0}
+@media(forced-colors:active){.quantity-row select{appearance:auto;-webkit-appearance:auto}.quantity-control::after{display:none}}
 .purchase-total{display:flex;justify-content:space-between;gap:16px;border-top:1px solid #eadfd4;padding-top:20px;margin-top:20px;font-size:16px}
 .purchase-total strong{font-weight:650;font-variant-numeric:tabular-nums}
 .purchase-card .purchase-assurance{text-align:center}

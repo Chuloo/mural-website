@@ -1,12 +1,18 @@
-import { PURCHASE_API, SESSION_KEY, ATTEMPT_KEY, purchaseSession, purchaseAttempt, purchaseCatalog, originalOrderQuote, checkoutRedirect, purchaseResult } from './buy-minutes-core.js?v=20261005-recovery';
+import { PURCHASE_API, SESSION_KEY, ATTEMPT_KEY, RETURN_KEY, purchaseSession, purchaseReturn, purchaseCatalog, checkoutRedirect, purchaseResult } from './buy-minutes-core.js?v=20261005-simple-checkout';
 
 const byID = id => document.getElementById(id);
 const read = key => { try { return JSON.parse(sessionStorage.getItem(key)); } catch { return null; } };
-const store = (key,value) => { sessionStorage.setItem(key,JSON.stringify(value)); };
+const store = (key,value) => {
+  try { sessionStorage.setItem(key,JSON.stringify(value)); }
+  catch { const error=new Error(); error.code='storage_unavailable'; throw error; }
+};
+const remove = key => { try { sessionStorage.removeItem(key); } catch { /* Storage is checked before requests. */ } };
 let session = purchaseSession(read(SESSION_KEY));
-let attempt = session ? purchaseAttempt(read(ATTEMPT_KEY),session.email) : null;
+let attempt = null, payment = null;
+const returned = session ? purchaseReturn(read(RETURN_KEY),session.email) : null;
+remove(ATTEMPT_KEY); remove(RETURN_KEY);
 let challenge, enteredEmail = '', catalog, busy = false, resendAt = 0;
-const steps = ['email','code','packs','result'];
+const steps = ['email','code','packs'];
 const message = text => { byID('purchase-status').textContent = text; };
 function show(step,{focus=true}={}) {
   for (const name of steps) byID(`${name}-step`).hidden = name !== step;
@@ -22,10 +28,13 @@ function setBusy(value) {
   }
   byID('resend-code').disabled = value || Date.now()<resendAt;
   byID('checkout').disabled = value || !catalog;
+  byID('quantity').disabled = value || !catalog;
+  for (const radio of document.querySelectorAll('input[name=pack]')) radio.disabled = value;
 }
-function clearSession(preserveAttempt=false) {
-  session = null; attempt = null; catalog = undefined; challenge = undefined;
-  sessionStorage.removeItem(SESSION_KEY); if (!preserveAttempt) sessionStorage.removeItem(ATTEMPT_KEY); byID('email-code').value = '';
+function clearSession() {
+  session = null; attempt = null; payment = null; catalog = undefined; challenge = undefined;
+  remove(SESSION_KEY); remove(ATTEMPT_KEY); remove(RETURN_KEY);
+  byID('email-code').value = ''; byID('result-step').hidden = true;
 }
 function errorCopy(error) {
   if (error.code === 'purchase_verification_required') return 'Your checkout access has expired. Verify your Mural email again to continue.';
@@ -55,7 +64,7 @@ async function run(action) {
   setBusy(true); message('');
   try { await action(); }
   catch (error) {
-    if (error.code==='purchase_verification_required') { clearSession(true); show('email'); }
+    if (error.code==='purchase_verification_required') { clearSession(); show('email'); }
     message(errorCopy(error));
   } finally { setBusy(false); }
 }
@@ -67,6 +76,7 @@ function total() {
 }
 async function loadProducts() {
   catalog = purchaseCatalog(await request('/products'));
+  attempt = null;
   byID('verified-email').textContent=session.email;
   const list=byID('pack-list'); list.replaceChildren();
   catalog.products.forEach((product,index) => {
@@ -88,46 +98,26 @@ async function sendCode() {
   challenge=reply.challengeID; resendAt=Date.now()+60_000; byID('email-code').value=''; show('code');
 }
 async function checkPayment() {
-  if (!attempt) { await loadProducts(); return; }
-  show('result'); byID('resume-checkout').hidden=true; byID('buy-again').hidden=true;
+  if (!payment) return;
+  byID('result-step').hidden=false;
   byID('result-title').textContent='Checking your payment'; byID('result-message').textContent='Your account updates after Stripe confirms the payment.';
-  if (!attempt.orderID) {
-    try {
-      const value=await request(`/orders/by-key/${encodeURIComponent(attempt.key)}`);
-      if (!/^[a-f0-9-]{36}$/i.test(value.orderID)) throw new Error('invalid_response');
-      attempt.orderID=value.orderID; store(ATTEMPT_KEY,attempt);
-    } catch (error) {
-      if (error.code!=='purchase_not_found') throw error;
-      byID('result-title').textContent='Checkout interrupted';
-      byID('result-message').textContent='No payment is confirmed. Continue with the same purchase to avoid a duplicate checkout.';
-      byID('resume-checkout').hidden=false; return;
-    }
-  }
-  const status=await request(`/orders/${encodeURIComponent(attempt.orderID)}`);
-  const state=purchaseResult(status,attempt.orderID);
-  Object.assign(attempt,originalOrderQuote(status,attempt)); store(ATTEMPT_KEY,attempt);
+  const status=await request(`/orders/${encodeURIComponent(payment.orderID)}`);
+  const state=purchaseResult(status,payment.orderID);
   byID('result-title').textContent=state.title; byID('result-message').textContent=state.message;
-  if (state.resumable) byID('result-message').textContent+=` This purchase’s subtotal is ${dollars(attempt.unitTotalMinor*attempt.quantity)}. Review it before continuing to payment.`;
-  byID('check-payment').hidden=state.complete; byID('buy-again').hidden=!state.complete;
-  byID('resume-checkout').hidden=!state.resumable;
+  byID('check-payment').hidden=state.complete;
 }
-async function checkout(resume=false) {
-  let product;
-  if (!resume) {
-    if (!catalog) throw new Error('invalid_purchase');
-    product=selectedProduct(); const quantity=Number(byID('quantity').value);
-    if (!product || !Number.isInteger(quantity) || quantity<1 || quantity>catalog.maximumQuantity) throw new Error('invalid_purchase');
-    attempt={email:session.email,key:crypto.randomUUID(),sku:product.sku,quantity,unitTotalMinor:product.totalMinor,unitAIValueNanoUSD:product.aiValueNanoUSD}; store(ATTEMPT_KEY,attempt);
-  }
-  if (!attempt) throw new Error('invalid_purchase');
-  show('result'); byID('result-title').textContent='Opening secure checkout';
-  byID('result-message').textContent='If this step is interrupted, check the same purchase before trying again.';
-  byID('resume-checkout').hidden=false; byID('check-payment').hidden=false; byID('buy-again').hidden=true;
-  const reply=await request('/orders',{method:'POST',body:{sku:attempt.sku,quantity:attempt.quantity},key:attempt.key});
-  if (!attempt.orderID && typeof reply.orderID==='string' && /^[a-f0-9-]{36}$/i.test(reply.orderID)) {
-    attempt.orderID=reply.orderID; store(ATTEMPT_KEY,attempt);
-  }
-  const redirect=checkoutRedirect(reply,attempt); attempt.orderID=redirect.orderID; store(ATTEMPT_KEY,attempt);
+async function checkout() {
+  if (!catalog) throw new Error('invalid_purchase');
+  const product=selectedProduct(),quantity=Number(byID('quantity').value);
+  if (!product || !Number.isInteger(quantity) || quantity<1 || quantity>catalog.maximumQuantity) throw new Error('invalid_purchase');
+  if (!attempt || attempt.sku!==product.sku || attempt.quantity!==quantity)
+    attempt={email:session.email,key:crypto.randomUUID(),sku:product.sku,quantity,unitTotalMinor:product.totalMinor,unitAIValueNanoUSD:product.aiValueNanoUSD};
+  const draft=attempt;
+  message('Opening secure checkout…');
+  const reply=await request('/orders',{method:'POST',body:{sku:draft.sku,quantity:draft.quantity},key:draft.key});
+  if (attempt!==draft) return;
+  const redirect=checkoutRedirect(reply,draft); draft.orderID=redirect.orderID;
+  store(RETURN_KEY,{email:session.email,orderID:redirect.orderID,expiresAt:session.expiresAt});
   location.assign(redirect.url);
 }
 byID('email-form').addEventListener('submit',event=>{ event.preventDefault(); run(async()=>{ enteredEmail=byID('account-email').value.trim().toLowerCase(); await sendCode(); }); });
@@ -136,22 +126,27 @@ byID('code-form').addEventListener('submit',event=>{ event.preventDefault(); run
   if (value.expiresInSeconds!==1800) throw new Error('invalid_response');
   session=purchaseSession({...value,expiresAt:Date.now()+1_800_000}); if (!session) throw new Error('invalid_response');
   store(SESSION_KEY,session); byID('email-code').value='';
-  attempt=purchaseAttempt(read(ATTEMPT_KEY),session.email);
-  if (attempt) await checkPayment(); else await loadProducts();
+  await loadProducts();
 }); });
 byID('resend-code').addEventListener('click',()=>run(sendCode));
 byID('change-email').addEventListener('click',()=>{ challenge=undefined; show('email'); });
 byID('sign-out').addEventListener('click',()=>run(async()=>{ try { await request('/session',{method:'DELETE'}); } finally { clearSession(); show('email'); } }));
 byID('purchase-form').addEventListener('submit',event=>{ event.preventDefault(); run(()=>checkout()); });
-byID('pack-list').addEventListener('change',total); byID('quantity').addEventListener('change',total);
+byID('pack-list').addEventListener('change',()=>{ attempt=null; total(); }); byID('quantity').addEventListener('change',()=>{ attempt=null; total(); });
 byID('check-payment').addEventListener('click',()=>run(checkPayment));
-byID('resume-checkout').addEventListener('click',()=>run(()=>checkout(true)));
-byID('buy-again').addEventListener('click',()=>run(async()=>{ attempt=null; sessionStorage.removeItem(ATTEMPT_KEY); await loadProducts(); }));
 setInterval(()=>{ byID('resend-code').disabled=busy || Date.now()<resendAt; },1000);
 try { sessionStorage.setItem('mural-storage-check','1'); sessionStorage.removeItem('mural-storage-check'); }
 catch { const error=new Error(); error.code='storage_unavailable'; setBusy(true); message(errorCopy(error)); }
 if (!busy) run(async()=>{
   if (!session) { show('email',{focus:false}); return; }
   const identity=await request('/session'); if (identity.email!==session.email) throw new Error('invalid_response');
-  if (attempt) await checkPayment(); else await loadProducts();
+  await loadProducts();
+  if (returned?.checkOnReturn) { payment={orderID:returned.orderID}; await checkPayment(); }
+});
+window.addEventListener('pageshow',event=>{
+  if (!event.persisted) return;
+  remove(RETURN_KEY); remove(ATTEMPT_KEY);
+  attempt=null; payment=null; byID('result-step').hidden=true;
+  setBusy(false);
+  run(async()=>{ if (!session || session.expiresAt<=Date.now()) { clearSession(); show('email',{focus:false}); return; } await loadProducts(); });
 });

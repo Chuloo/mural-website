@@ -7,7 +7,7 @@ button{font:inherit}
 button,a{-webkit-tap-highlight-color:transparent}
 a:focus-visible,button:focus-visible{outline:3px solid var(--focus);outline-offset:6px;border-radius:6px}
 .wrap{width:min(1120px,calc(100% - 64px));margin-inline:auto}
-.site-header{display:flex;align-items:center;justify-content:space-between;padding-top:32px;position:relative;z-index:2}
+.site-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:32px;position:relative;z-index:2}
 .brand{display:inline-flex;align-items:center;gap:10px;font-size:40px;letter-spacing:-2.6px;font-weight:800;line-height:1}
 .brand-dot{width:23px;height:23px;border-radius:50%;background:radial-gradient(circle at 22% 15%,#fff1c7,#ffa269 62%,#ff8a4d)}
 .maker{font-size:13px;color:var(--muted)}
@@ -42,6 +42,7 @@ h1{font-size:clamp(44px,6.1vw,80px);font-weight:650;line-height:1.09;letter-spac
 .button{display:inline-flex;align-items:center;justify-content:center;gap:14px;border-radius:100px;padding:17px 25px;font-size:14px;font-weight:600;line-height:1.1;min-height:52px;transition:transform .2s,box-shadow .2s;background:#ffffffb8;border:1px solid #fff9;box-shadow:0 4px 18px #7d542b05}
 .download-button{min-width:156px;min-height:54px;padding:14px 24px;justify-content:center;text-align:center}
 .button:hover{transform:translateY(-2px);box-shadow:0 8px 24px #a96c3216}
+.button.header-buy{min-height:44px;padding:12px 18px;font-size:13px;white-space:nowrap;flex-shrink:0}
 .button.primary{background:var(--orange);border-color:#ffb086;box-shadow:0 7px 24px #fd9b5826}
 .availability{font-size:11px;font-weight:400;line-height:1.7;color:#8a786a;margin:19px auto 0;max-width:690px}
 .features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
