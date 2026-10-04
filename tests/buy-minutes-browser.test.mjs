@@ -36,7 +36,7 @@ const product={sku:'small',environment:'live',currency:'usd',totalMinor:500,enti
   aiValueNanoUSD:'3690000000',estimatedMilliseconds:1920000,quote:{currency:'usd',currencyExponent:2,totalMinor:500}};
 async function fixture(seed){
   const context=await browser.newContext({viewport:{width:390,height:844}}),page=await context.newPage();
-  const id=randomUUID(),key=seed?.key??randomUUID();let state='created',catalogCalls=0,failOrder=false;const requests=[],orders=[];
+  const id=seed?.orderID??randomUUID(),key=seed?.key??randomUUID();let state=seed?.state??'created',catalogCalls=0,failOrder=false;const requests=[],orders=[];
   if(seed)await context.addInitScript(({seed,token,email})=>{
     if(!sessionStorage.getItem('mural.web-purchase.v1'))sessionStorage.setItem('mural.web-purchase.v1',JSON.stringify({token,email,expiresAt:Date.now()+1800000}));
     if(!sessionStorage.getItem('mural.web-purchase-attempt.v1'))sessionStorage.setItem('mural.web-purchase-attempt.v1',JSON.stringify(seed));
@@ -58,7 +58,7 @@ async function fixture(seed){
       if(failOrder){failOrder=false;return route.abort('failed');}
       const quantity=req.postDataJSON().quantity;
       return reply({orderID:id,sku:'small',quantity,environment:'live',currency:'usd',totalMinor:500*quantity,aiValueNanoUSD:(3690000000n*BigInt(quantity)).toString(),entitlementKind:'ai_value',
-        payment:{orderID:id,checkoutURL:'https://checkout.stripe.com/c/pay/synthetic'}});
+        payment:{orderID:id,checkoutURL:'https://checkout.stripe.com/c/pay/synthetic#fidkdWxOYHwnPyd1synthetic'}});
     }
     if(path.startsWith('/orders/by-key/'))return reply({orderID:id});
     if(path.startsWith('/orders/'))return reply({orderID:id,entitlementKind:'ai_value',state,grantedNanoUSD:state==='purchased'?'7380000000':'0',
@@ -111,6 +111,21 @@ test('interrupted create recovers the existing order after reload without anothe
     await f.page.reload();await f.page.locator('#resume-checkout').waitFor({state:'visible'});
     await f.page.locator('#resume-checkout').click();await f.page.waitForURL('https://checkout.stripe.com/**');
     assert.equal(f.orders.length,2);assert.equal(f.orders[1].key,key);
+  }finally{await f.close();}
+});
+test('pending unpaid checkout resumes its original order and quote with the opaque Stripe fragment',async()=>{
+  const f=await fixture({state:'pending',changedCatalog:true,orderID:randomUUID()});try{
+    await f.page.goto(`${origin}/buy-minutes/`);await f.page.locator('#resume-checkout').waitFor({state:'visible'});
+    assert.equal(await f.page.locator('#result-title').textContent(),'Payment not confirmed yet');
+    assert.ok((await f.page.locator('#result-message').textContent()).includes('$10.00'));
+    await f.page.locator('#resume-checkout').click();await f.page.waitForURL('https://checkout.stripe.com/**');
+    assert.equal(new URL(f.page.url()).hash,'#fidkdWxOYHwnPyd1synthetic');
+    assert.equal(f.orders.length,1);assert.equal(f.orders[0].key,f.key);assert.deepEqual(f.orders[0].body,{sku:'small',quantity:2});
+    assert.equal(f.catalogCalls,0);
+    await f.page.goto(`${origin}/payment-return?status=success`);await f.page.waitForURL(`${origin}/buy-minutes/`);
+    await f.page.locator('#resume-checkout').waitFor({state:'visible'});
+    assert.equal(await f.page.locator('#result-title').textContent(),'Payment not confirmed yet');
+    assert.equal(f.orders.length,1);
   }finally{await f.close();}
 });
 test('unpaid expired checkout is not called refunded and generic native return never redirects',async()=>{
