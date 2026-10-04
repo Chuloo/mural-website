@@ -1,0 +1,42 @@
+.purchase{max-width:620px;padding-block:70px 35px;min-height:calc(100svh - 150px)}
+.purchase [hidden]{display:none!important}
+.purchase-heading{margin-bottom:32px}
+.purchase h1{display:block;font-size:clamp(38px,5vw,54px);line-height:1.08;letter-spacing:-.045em;text-wrap:balance}
+.purchase-heading>p{margin:20px 0 0;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:17px;font-weight:400;color:var(--muted);line-height:1.65}
+.purchase-card{background:#ffffffa6;border:1px solid #fff;border-radius:28px;padding:32px}
+.purchase-card h2{margin:0 0 12px;font-size:25px;font-weight:650;letter-spacing:-.6px;line-height:1.2}
+.purchase-card p{font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.65;color:var(--muted);margin:0 0 23px}
+.purchase-card label{font-size:14px;font-weight:550}
+.purchase-card input:not([type=radio]){appearance:none;width:100%;font:inherit;font-size:17px;color:var(--ink);background:#fff;border:1px solid #c9b5a4;border-radius:14px;padding:15px 16px;margin-top:9px;min-height:54px}
+.purchase-card input:focus-visible,.purchase-card select:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.purchase-card input[aria-invalid=true]{border-color:#a74232}
+.purchase-card .field-help{font-size:12px;line-height:1.65;margin:11px 0 0}
+.purchase-primary{width:100%;margin-top:23px;font-size:15px;cursor:pointer;color:var(--ink)}
+.purchase button:disabled{opacity:.65;cursor:default;transform:none;box-shadow:none}
+.purchase button[aria-busy=true]{cursor:wait}
+.purchase-links{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:18px}
+.text-button{border:0;background:transparent;color:var(--muted);font-size:13px;line-height:1.5;padding:12px 0;min-height:44px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.text-button:hover{color:var(--ink)}
+#email-code{letter-spacing:.25em;font-variant-numeric:tabular-nums}
+.purchase-account{display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid #eadfd4;padding-bottom:12px;margin-bottom:23px}
+.purchase-account p{font-size:13px;margin:0;overflow-wrap:anywhere}
+.purchase-account .text-button{flex-shrink:0}
+.pack-options{border:0;padding:0;margin:23px 0 0;min-width:0}
+#pack-list{display:grid;gap:10px}
+.pack-option{display:grid;grid-template-columns:20px minmax(0,1fr) auto;align-items:center;gap:12px;padding:17px 16px;border:1px solid #decebf;border-radius:17px;background:#fff;cursor:pointer;min-height:78px}
+.pack-option:has(input:checked){border-color:#c77546;background:#fff1e5;box-shadow:0 0 0 1px #c77546}
+.pack-option input{accent-color:#b95d2c;width:18px;height:18px;margin:0}
+.pack-name{display:block;font-size:16px;font-weight:600;line-height:1.4}
+.pack-minutes{display:block;font-family:system-ui,sans-serif;font-size:12px;font-weight:400;color:var(--muted);line-height:1.5;margin-top:3px}
+.pack-price{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.quantity-row{display:flex;align-items:center;justify-content:space-between;margin-top:23px;gap:16px}
+.quantity-row select{font:inherit;color:var(--ink);background:#fff;border:1px solid #c9b5a4;border-radius:12px;min-width:84px;min-height:44px;padding:8px 14px}
+.purchase-total{display:flex;justify-content:space-between;gap:16px;border-top:1px solid #eadfd4;padding-top:20px;margin-top:20px;font-size:16px}
+.purchase-total strong{font-weight:650;font-variant-numeric:tabular-nums}
+.purchase-card .purchase-assurance{text-align:center}
+.purchase-card .purchase-estimate{font-size:12px;margin:23px 0 0;line-height:1.65}
+.purchase-status{font-family:system-ui,sans-serif;font-size:14px;line-height:1.6;color:#903c2e;margin:18px 4px 0;overflow-wrap:anywhere}
+.purchase-status:empty{display:none}
+.purchase-support{text-align:center;font-size:13px;line-height:1.6;color:var(--muted);margin:25px 0 0}
+.purchase-support a{text-decoration:underline;text-underline-offset:3px}
+@media(max-width:600px){.purchase{padding-top:48px}.purchase-card{padding:25px 22px;border-radius:24px}.purchase-heading{margin-bottom:26px}.purchase-heading>p{font-size:16px}.pack-option{gap:10px;padding:16px 13px}.purchase-links{gap:4px 14px}.purchase-card h2{font-size:23px}}

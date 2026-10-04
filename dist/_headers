@@ -6,3 +6,18 @@
 
 /assets/*
   Cache-Control: public, max-age=3600
+
+/buy-minutes
+  Cache-Control: no-store
+  Referrer-Policy: no-referrer
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src https://api.mural.chat; frame-ancestors 'none'; form-action 'none'; base-uri 'none'
+
+/buy-minutes/*
+  Cache-Control: no-store
+  Referrer-Policy: no-referrer
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src https://api.mural.chat; frame-ancestors 'none'; form-action 'none'; base-uri 'none'
+
+/payment-return*
+  Cache-Control: no-store
+  Referrer-Policy: no-referrer
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src https://api.mural.chat; frame-ancestors 'none'; form-action 'none'; base-uri 'none'
