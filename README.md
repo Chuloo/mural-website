@@ -38,6 +38,18 @@ Production accepts requests only from `https://mural.chat`; local and Cloudflare
 
 Canonical URLs, social tags and the sitemap use `https://mural.chat`. The privacy and terms pages describe guest trials, optional accounts, hosted conversations, personal API keys, access requests and conditional purchases. The operator is Hackmamba Inc., registered in the United States. The public account-deletion request path is `/support/#delete-account`. Keep the policies aligned with deployed features, provider processing and retention; purchases are not advertised as active until live checkout is verified.
 
+## Website checkout
+
+`/buy-minutes/` verifies the email already shown in Mural’s Account screen before offering the existing live Stripe packs. The verification code gives30minutes of access to checkout and that account’s purchase status. It creates no Mural account and cannot join accounts that share an email. Apple relay addresses are supported. Unknown or ambiguous addresses receive the same code-request message.
+
+Checkout access and the original purchase attempt stay in this tab’s session storage. No token or email is placed in a URL. Returning from Stripe does not establish payment success: the page checks server fulfillment before saying minutes were added. Interrupted purchases retain the same idempotency key and original quote; verify the same email again if access expires. `/payment-return/` retains its generic native/Android behavior when there is no web purchase attempt.
+
+The production API accepts only the exact `https://mural.chat` origin on `/v1/web-purchases/*`. Deploy its matching migration, runtime grants, proxy paths and protected email configuration before merging this website. The purchase page and return page use a restrictive CSP, no-referrer policy and no-store caching. The website still deploys directly from `dist` with no build command. The Node package contains test dependencies only.
+
+Run `npm ci --ignore-scripts` and `npm test` for validation tests. `npm run test:browser` uses a fresh headless Chrome session, a local static server and intercepted synthetic API/Stripe responses. It covers mobile verification, quantity checkout, return/reload, interrupted attempts, original quote recovery and truthful payment/refund states. Set `PLAYWRIGHT_CHANNEL=chromium` after installing the Playwright Chromium browser if Chrome is unavailable. These tests send no emails and make no real purchases.
+
+See the backend [website purchase contract](https://github.com/Chuloo/mural/blob/main/services/api/docs/web-purchases.md) for account association, delivery limits, retention and rollout requirements.
+
 ## Assets and licenses
 
 The Allura signature font is self-hosted under its bundled SIL Open Font License. The GitHub mark comes from [GitHub’s Octicons](https://github.com/primer/octicons) under its bundled MIT license. The Apple mark uses the path published in [Apple’s website navigation](https://www.apple.com/). These marks identify their respective destinations and remain their owners’ trademarks. The Open Graph artwork was generated for Mural. The website source uses the [MIT License](LICENSE).

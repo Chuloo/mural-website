@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#fff9ee">
+  <meta name="description" content="Buy one-time Mural minute packs for your existing account. Verify your account email and pay securely with Stripe.">
+  <title>Buy minutes · Mural</title>
+  <link rel="canonical" href="https://mural.chat/buy-minutes/">
+  <link rel="icon" href="/favicon.ico?v=76c61c4da5" sizes="16x16 32x32 48x48">
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg?v=76c61c4da5" sizes="any">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=76c61c4da5">
+  <link rel="stylesheet" href="/assets/site.css?v=20260929-compact">
+  <link rel="stylesheet" href="/assets/buy-minutes.css?v=20261004">
+  <script type="module" src="/assets/buy-minutes.js?v=20261004"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header wrap"><a class="brand" href="/" aria-label="Mural home"><span class="brand-dot"></span>mural</a><a class="maker" href="/">Back to Mural</a></header>
+  <main id="main" class="purchase wrap">
+    <header class="purchase-heading">
+      <h1>Keep the conversation going.</h1>
+      <p>Add minutes to your Mural account with a one-time purchase.</p>
+    </header>
+
+    <section id="email-step" class="purchase-card" aria-labelledby="email-title">
+      <h2 id="email-title">Your Mural email</h2>
+      <p>Use the email shown in Mural → Settings → Account. We’ll send you a code to confirm where your minutes should go.</p>
+      <form id="email-form" method="post">
+        <label for="account-email">Email address</label>
+        <input id="account-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" required placeholder="you@example.com" aria-describedby="email-help">
+        <p id="email-help" class="field-help">Using Sign in with Apple? Your account may show a private relay address.</p>
+        <button id="send-code" class="button primary purchase-primary" type="submit">Send a code</button>
+      </form>
+    </section>
+
+    <section id="code-step" class="purchase-card" aria-labelledby="code-title" hidden>
+      <h2 id="code-title">Check your email</h2>
+      <p id="code-description">If this email matches an eligible Mural account, you’ll receive a code. Enter it below to continue.</p>
+      <form id="code-form" method="post">
+        <label for="email-code">Verification code</label>
+        <input id="email-code" name="code" type="text" autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" required aria-describedby="code-help">
+        <p id="code-help" class="field-help">The code expires after 10 minutes. Check your spam folder if it hasn’t arrived.</p>
+        <button id="verify-code" class="button primary purchase-primary" type="submit">Continue</button>
+      </form>
+      <div class="purchase-links"><button id="resend-code" class="text-button" type="button">Send another code</button><button id="change-email" class="text-button" type="button">Use a different email</button></div>
+    </section>
+
+    <section id="packs-step" class="purchase-card" aria-labelledby="packs-title" hidden>
+      <div class="purchase-account"><p id="verified-email"></p><button id="sign-out" class="text-button" type="button">Change</button></div>
+      <h2 id="packs-title">Choose your minutes</h2>
+      <form id="purchase-form" method="post">
+        <fieldset class="pack-options"><legend class="sr-only">Minute pack</legend><div id="pack-list"></div></fieldset>
+        <div class="quantity-row"><label for="quantity">Quantity</label><select id="quantity" name="quantity" aria-label="Number of packs"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option></select></div>
+        <div class="purchase-total"><span>Subtotal</span><strong id="checkout-total">—</strong></div>
+        <button id="checkout" class="button primary purchase-primary" type="submit" disabled>Continue to payment</button>
+        <p class="field-help purchase-assurance">Secure checkout with Stripe. Taxes, if any, appear at checkout. No subscription.</p>
+      </form>
+      <p class="purchase-estimate">Minute estimates vary with voice and teaching usage. Purchased credit does not expire.</p>
+    </section>
+
+    <section id="result-step" class="purchase-card" aria-labelledby="result-title" hidden>
+      <h2 id="result-title" tabindex="-1">Checking your payment</h2>
+      <p id="result-message">Your account updates after the payment is confirmed.</p>
+      <div class="purchase-links"><button id="check-payment" class="button primary" type="button">Check again</button><button id="resume-checkout" class="button primary" type="button" hidden>Continue to payment</button><button id="buy-again" class="text-button" type="button" hidden>Buy more minutes</button></div>
+    </section>
+
+    <p id="purchase-status" class="purchase-status" role="status" aria-live="polite" aria-atomic="true"></p>
+    <p class="purchase-support">Need a hand? <a href="/support/">We’re here to help.</a></p>
+    <noscript><p class="note">Please enable JavaScript to verify your account and buy minutes. You can also <a href="/support/">contact support</a>.</p></noscript>
+  </main>
+  <footer class="site-footer wrap"><span>© 2026 Hackmamba</span><nav aria-label="Footer"><a href="/buy-minutes/">Buy minutes</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/support/">Support</a><a href="https://github.com/Chuloo/mural">GitHub</a></nav></footer>
+</body>
+</html>
