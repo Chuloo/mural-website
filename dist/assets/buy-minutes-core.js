@@ -52,7 +52,7 @@ export function checkoutRedirect(value, attempt) {
       value.aiValueNanoUSD !== (BigInt(attempt.unitAIValueNanoUSD)*BigInt(attempt.quantity)).toString() ||
       value.payment?.orderID !== value.orderID || typeof value.payment.checkoutURL !== 'string') throw new Error('invalid_checkout');
   const url = new URL(value.payment.checkoutURL);
-  if (url.protocol !== 'https:' || url.hostname !== 'checkout.stripe.com' || url.port || url.username || url.password || url.hash)
+  if (url.protocol !== 'https:' || url.hostname !== 'checkout.stripe.com' || url.port || url.username || url.password)
     throw new Error('invalid_checkout');
   return { orderID:value.orderID,url:url.href };
 }
@@ -70,5 +70,6 @@ export function purchaseResult(value, expectedID) {
       'Your purchase and partial refund are recorded. Open Account in Mural to check your balance.':
       'Your purchase is confirmed. Open Account in Mural on any device to see your updated balance.',complete:true };
   return { title:'Payment not confirmed yet',message:'We haven’t received a confirmed payment. Check again in a moment before paying again.',complete:false,
-    resumable:value.state === 'created' };
+    resumable:['created','pending'].includes(value.state) && !value.fulfillmentRecorded && value.grantedNanoUSD === '0' &&
+      value.reversedNanoUSD === '0' && value.reversalOutstandingNanoUSD === '0' };
 }

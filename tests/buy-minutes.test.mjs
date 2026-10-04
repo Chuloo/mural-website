@@ -28,11 +28,13 @@ test('catalog rejects synthetic, malformed, oversized and duplicate offers',()=>
 });
 test('checkout redirects bind original amount, allocation, quantity, order and exact Stripe host',()=>{
   assert.equal(checkoutRedirect(order,attempt).orderID,id);
+  const fragmentURL='https://checkout.stripe.com/c/pay/synthetic#fidkdWxOYHwnPyd1synthetic';
+  assert.equal(checkoutRedirect({...order,payment:{...order.payment,checkoutURL:fragmentURL}},attempt).url,fragmentURL);
   const otherID=randomUUID();
   for(const value of [{...order,orderID:otherID,payment:{...order.payment,orderID:otherID}},
     {...order,totalMinor:1001},{...order,aiValueNanoUSD:'7380000001'},{...order,quantity:undefined},{...order,environment:'test'},
     {...order,payment:{...order.payment,orderID:randomUUID()}},...['http://checkout.stripe.com/x','https://checkout.stripe.com.evil.test/x',
-      'https://name@checkout.stripe.com/x','https://checkout.stripe.com:8443/x','https://checkout.stripe.com/x#secret'].map(checkoutURL=>({...order,payment:{...order.payment,checkoutURL}}))])
+      'https://name@checkout.stripe.com/x','https://checkout.stripe.com:8443/x','javascript:alert(1)'].map(checkoutURL=>({...order,payment:{...order.payment,checkoutURL}}))])
     assert.throws(()=>checkoutRedirect(value,attempt));
   // A later catalog revision does not change the original resumable order.
   const newCatalog=purchaseCatalog({...catalog,products:[{...product,totalMinor:600,quote:{...product.quote,totalMinor:600}}]});
@@ -42,6 +44,11 @@ test('checkout redirects bind original amount, allocation, quantity, order and e
 });
 test('redirect success claims do not prove fulfillment and unpaid closed checkout is distinct from a refund',()=>{
   assert.equal(purchaseResult(status,id).complete,false);
+  assert.equal(purchaseResult(status,id).resumable,true);
+  assert.equal(purchaseResult({...status,state:'pending'},id).resumable,true);
+  for(const value of [{...status,state:'purchased'},{...status,state:'pending',fulfillmentRecorded:true},
+    {...status,state:'pending',grantedNanoUSD:'1'},{...status,state:'pending',reversedNanoUSD:'1'},
+    {...status,state:'pending',reversalOutstandingNanoUSD:'1'}])assert.notEqual(purchaseResult(value,id).resumable,true);
   assert.equal(purchaseResult({...status,state:'purchased'},id).complete,false);
   const paid={...status,state:'purchased',grantedNanoUSD:'7380000000',fulfillmentRecorded:true};
   assert.equal(purchaseResult(paid,id).title,'Minutes added');
