@@ -1,4 +1,4 @@
-import { PURCHASE_API, SESSION_KEY, ATTEMPT_KEY, purchaseSession, purchaseAttempt, purchaseCatalog, originalOrderQuote, checkoutRedirect, purchaseResult } from './buy-minutes-core.js';
+import { PURCHASE_API, SESSION_KEY, ATTEMPT_KEY, purchaseSession, purchaseAttempt, purchaseCatalog, originalOrderQuote, checkoutRedirect, purchaseResult } from './buy-minutes-core.js?v=20261005-recovery';
 
 const byID = id => document.getElementById(id);
 const read = key => { try { return JSON.parse(sessionStorage.getItem(key)); } catch { return null; } };
