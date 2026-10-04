@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
-import { purchaseSession,purchaseAttempt,purchaseCatalog,originalOrderQuote,checkoutRedirect,purchaseResult } from '../dist/assets/buy-minutes-core.js';
+import { purchaseSession,purchaseAttempt,purchaseReturn,purchaseCatalog,originalOrderQuote,checkoutRedirect,purchaseResult } from '../dist/assets/buy-minutes-core.js';
 
 const email='buyer@private.icloud.com',token='a'.repeat(43),id=randomUUID();
 const product={sku:'small',environment:'live',currency:'usd',totalMinor:500,entitlementKind:'ai_value',billingBasis:'actual-ai-usage',estimate:true,
@@ -56,4 +56,13 @@ test('redirect success claims do not prove fulfillment and unpaid closed checkou
   assert.equal(purchaseResult({...paid,reversedNanoUSD:'7380000000'},id).title,'Purchase refunded');
   assert.ok(purchaseResult({...paid,reversedNanoUSD:'3690000000'},id).message.includes('partial refund'));
   assert.throws(()=>purchaseResult(status,randomUUID()));
+});
+
+test('return correlation is minimal, current and tied to the verified email',()=>{
+  const reference={email,orderID:id,expiresAt:1900};
+  assert.deepEqual(purchaseReturn(reference,email,1000),{...reference,checkOnReturn:false});
+  assert.deepEqual(purchaseReturn({...reference,checkOnReturn:true},email,1000),{...reference,checkOnReturn:true});
+  for(const value of [null,[],{...reference,email:'other@example.test'},{...reference,orderID:'bad'},
+    {...reference,expiresAt:999},{...reference,expiresAt:1801001},{...reference,key:randomUUID()},
+    {...reference,unitTotalMinor:500},{...reference,checkOnReturn:'true'}])assert.equal(purchaseReturn(value,email,1000),null);
 });
