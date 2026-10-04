@@ -33,7 +33,7 @@ const product={sku:'small',environment:'live',currency:'usd',totalMinor:500,enti
   aiValueNanoUSD:'3690000000',estimatedMilliseconds:1920000,quote:{currency:'usd',currencyExponent:2,totalMinor:500}};
 async function fixture(seed={}){
   const context=await browser.newContext({viewport:{width:390,height:844}}),page=await context.newPage();
-  let state=seed.state??'pending',failOrder=false,held=false,releaseHeld,markHeld;const requests=[],orders=[],byKey=new Map();
+  let state=seed.state??'pending',failOrder=false,held=false,releaseHeld,markHeld;const requests=[],orders=[],byKey=new Map((seed.ownedOrders??[]).map(order=>[order.id,order]));
   const heldReady=new Promise(resolve=>{markHeld=resolve;});
   if(seed.session||seed.legacy)await context.addInitScript(({seed,token,email,SESSION,ATTEMPT})=>{
     if(sessionStorage.getItem('__fixture-seeded'))return;
@@ -64,7 +64,9 @@ async function fixture(seed={}){
         payment:{orderID:order.id,checkoutURL:'https://checkout.stripe.com/c/pay/synthetic#fidkdWxOYHwnPyd1synthetic'}});
     }
     if(path.startsWith('/orders/')){
-      const id=path.split('/').at(-1),order=[...byKey.values()].find(value=>value.id===id),quantity=order?.quantity??2;
+      const id=path.split('/').at(-1),order=[...byKey.values()].find(value=>value.id===id);
+      if(!order)return reply({error:{code:'not_found'}},404);
+      const quantity=order.quantity;
       return reply({orderID:id,entitlementKind:'ai_value',state,grantedNanoUSD:state==='purchased'?(3690000000n*BigInt(quantity)).toString():'0',
         reversedNanoUSD:'0',reversalOutstandingNanoUSD:'0',fulfillmentRecorded:state==='purchased',order:{sku:'small',quantity,currency:'usd',totalMinor:500*quantity,aiValueNanoUSD:(3690000000n*BigInt(quantity)).toString()}});
     }
@@ -119,9 +121,10 @@ test('uncertain response retries the in-memory key without persisting a draft; r
 });
 test('legacy pending browser records cannot restore a locked form or an old price',async()=>{
   const legacy={email,key:randomUUID(),sku:'small',quantity:2,unitTotalMinor:500,unitAIValueNanoUSD:'3690000000',orderID:randomUUID()};
-  const f=await fixture({legacy,changedCatalog:true});try{
+  const f=await fixture({legacy,ownedOrders:[{id:legacy.orderID,sku:legacy.sku,quantity:legacy.quantity}],changedCatalog:true});try{
     await f.page.goto(`${origin}/buy-minutes/`);await f.editable();assert.equal(await f.page.locator('#checkout-total').textContent(),'$6.00');
     assert.equal(await f.page.evaluate(key=>sessionStorage.getItem(key),ATTEMPT),null);assert.equal(f.orders.length,0);
+    assert.equal(await f.page.evaluate(async({id,token})=>(await fetch(`https://api.mural.chat/v1/web-purchases/orders/${id}`,{headers:{Authorization:`Bearer ${token}`}})).status,{id:randomUUID(),token}),404);
     await f.page.evaluate(({legacy,ATTEMPT})=>sessionStorage.setItem(ATTEMPT,JSON.stringify(legacy)),{legacy,ATTEMPT});
     await f.page.goto(`${origin}/payment-return?status=cancelled`);await f.page.waitForURL(`${origin}/buy-minutes/`);await f.editable();
     assert.equal(await f.page.locator('#result-step').isVisible(),false);assert.equal(f.orders.length,0);
@@ -136,8 +139,16 @@ test('restored page resets busy controls and ignores an abandoned checkout respo
     await f.login();f.holdOrder=true;await f.page.locator('#checkout').click();await f.heldReady;
     assert.equal(await f.page.locator('#checkout').isDisabled(),true);
     await f.page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true})));await f.editable();
-    const response=f.page.waitForResponse(response=>response.url().endsWith('/orders'));f.releaseHeld();await response;
-    await f.page.waitForFunction(()=>document.getElementById('purchase-status').textContent==='');
+    await f.page.evaluate(()=>{
+      // run() updates aria-busy in its finally block after consuming the response.
+      const button=document.getElementById('checkout');
+      window.__lateCheckoutFinished=new Promise(resolve=>{
+        const observer=new MutationObserver(()=>{if(button.getAttribute('aria-busy')==='false'){observer.disconnect();resolve();}});
+        observer.observe(button,{attributes:true,attributeFilter:['aria-busy']});
+      });
+    });
+    f.releaseHeld();
+    await f.page.evaluate(async()=>{await window.__lateCheckoutFinished;await new Promise(requestAnimationFrame);});
     assert.equal(f.page.url(),`${origin}/buy-minutes/`);assert.equal(await f.page.locator('#quantity').isEnabled(),true);
     assert.equal(await f.page.evaluate(key=>sessionStorage.getItem(key),RETURN),null);assert.equal(f.orders.length,1);
   }finally{f.releaseHeld();await f.close();}
