@@ -30,9 +30,9 @@ See [Cloudflare’s Git integration guide](https://developers.cloudflare.com/pag
 
 ## Release details
 
-The homepage and `/download/` offer Android (Google Play), Apple (the iPhone waitlist form), and Github (the source repository). The Apple dialog explains the waitlist, and `/download/` retains the source installation guide. When Apple access opens, replace the waitlist destination with the verified public installation route. Do not advertise available free minutes or purchases until those features are enabled and verified.
+The homepage and `/download/` link directly to Google Play, the live [Mural App Store listing](https://apps.apple.com/app/mural-speak-languages/id6816001011), and the GitHub source repository. The Apple buttons keep their existing appearance and work without JavaScript. `/download/` also retains the source installation guide.
 
-The form submits to `https://api.mural.chat/v1/access-requests`. The separate app backend stores the email, request date, consent version and website source in PostgreSQL. It sends no automatic emails and creates no app account. Validation, duplicate handling, admission limits, retention and private export/deletion commands are documented in the [access-request runbook](https://github.com/Chuloo/mural/blob/codex/android-release/services/api/docs/access-requests.md). Deploy that backend before publishing the form. No credentials belong in this repository.
+The retained access-request form code submits to `https://api.mural.chat/v1/access-requests`. The separate app backend stores the email, request date, consent version and website source in PostgreSQL. It sends no automatic emails and creates no app account. Validation, duplicate handling, admission limits, retention and private export/deletion commands are documented in the [access-request runbook](https://github.com/Chuloo/mural/blob/codex/android-release/services/api/docs/access-requests.md). Deploy that backend before publishing the form. No credentials belong in this repository.
 
 Production accepts requests only from `https://mural.chat`; local and Cloudflare preview pages can show the form but cannot submit to the production database. Use a separately configured local API for development submissions. A successful form test should use a disposable test address and remove its database row afterward.
 
